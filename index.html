@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimation immobilière — David Regnery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Tokens ---------- */
+  :root{
+    --noir:#101010;
+    --noir-soft:#1c1b18;
+    --or:#D8B33C;
+    --or-clair:#e9cf7a;
+    --creme:#FAF8F3;
+    --ligne:#E6E1D5;
+    --gris:#6B6B66;
+    --gris-fort:#3a3a36;
+    --ombre:0 1px 2px rgba(16,16,16,.04),0 8px 30px rgba(16,16,16,.06);
+  }
+  *{box-sizing:border-box}
+  .dvf-app{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    color:var(--noir);
+    background:var(--creme);
+    max-width:980px;
+    margin:0 auto;
+    padding:0;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--ombre);
+    border:1px solid var(--ligne);
+  }
+  .dvf-app *{margin:0}
+
+  /* ---------- En-tête ---------- */
+  .dvf-head{
+    background:var(--noir);
+    color:#fff;
+    padding:26px 30px 24px;
+    position:relative;
+  }
+  .dvf-head::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+    background:linear-gradient(90deg,var(--or),var(--or-clair),var(--or));
+  }
+  .dvf-eyebrow{
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--or);font-weight:600;margin-bottom:10px;
+  }
+  .dvf-head h1{
+    font-family:'Fraunces',Georgia,serif;font-weight:500;
+    font-size:27px;line-height:1.15;letter-spacing:-.01em;
+  }
+  .dvf-head p{color:#bdbab2;font-size:13.5px;margin-top:8px;max-width:60ch}
+
+  .dvf-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .dvf-badges span{
+    font-size:11.5px;font-weight:600;color:var(--or-clair);
+    background:rgba(216,179,60,.12);border:1px solid rgba(216,179,60,.3);
+    padding:5px 11px;border-radius:99px;white-space:nowrap;
+  }
+  .dvf-expert{
+    display:flex;align-items:center;gap:14px;margin-top:18px;
+    padding-top:18px;border-top:1px solid rgba(255,255,255,.1);
+  }
+  .dvf-avatar{
+    width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;
+    border:2px solid var(--or);background:#222;
+  }
+  .dvf-quote{color:#e8e5dd;font-size:13px;line-height:1.5;font-style:italic;margin:0}
+  .dvf-expert-name{color:#bdbab2;font-size:12px;margin-top:5px}
+  .dvf-google{color:var(--or);font-weight:600;font-style:normal}
+
+  /* ---------- Corps ---------- */
+  .dvf-social{
+    background:#fff;border-bottom:1px solid var(--ligne);
+    text-align:center;font-size:12.5px;color:var(--gris-fort);
+    padding:11px 24px;line-height:1.4;
+  }
+  .dvf-stars{color:var(--or);letter-spacing:2px;margin-right:6px}
+  .dvf-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .dvf-form{padding:28px 30px;border-right:1px solid var(--ligne)}
+  .dvf-result{padding:28px 30px;background:#fff}
+
+  .dvf-field{margin-bottom:17px}
+  .dvf-field.hidden,.dvf-row.hidden{display:none}
+  label.dvf-lab{
+    display:block;font-size:12.5px;font-weight:600;color:var(--gris-fort);
+    margin-bottom:7px;letter-spacing:.01em;
+  }
+  .dvf-hint{font-weight:400;color:var(--gris);font-size:11.5px}
+
+  select,input[type=number]{
+    width:100%;padding:11px 12px;border:1px solid var(--ligne);
+    border-radius:10px;font-size:14.5px;font-family:inherit;color:var(--noir);
+    background:#fff;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;
+  }
+  select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236B6B66' stroke-width='1.6' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+  select:focus,input:focus{outline:none;border-color:var(--or);box-shadow:0 0 0 3px rgba(216,179,60,.18)}
+
+  /* segmented + chips */
+  .dvf-seg{display:flex;flex-wrap:wrap;gap:7px}
+  .dvf-chip{
+    flex:1 1 auto;min-width:fit-content;text-align:center;
+    padding:9px 12px;border:1px solid var(--ligne);border-radius:10px;
+    font-size:13px;font-weight:500;color:var(--gris-fort);background:#fff;cursor:pointer;
+    transition:.15s;user-select:none;
+  }
+  .dvf-chip:hover{border-color:#cfc7b3}
+  .dvf-chip.on{background:var(--noir);color:#fff;border-color:var(--noir)}
+  .dvf-chip.on .dvf-ico{filter:invert(1)}
+
+  .dvf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .dvf-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;color:var(--gris-fort);font-weight:500}
+  .dvf-toggle input{position:absolute;opacity:0;width:0;height:0}
+  .dvf-switch{width:40px;height:23px;border-radius:99px;background:#d9d3c4;position:relative;transition:.18s;flex:none}
+  .dvf-switch::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .dvf-toggle input:checked + .dvf-switch{background:var(--or)}
+  .dvf-toggle input:checked + .dvf-switch::after{transform:translateX(17px)}
+  .dvf-toggle input:focus-visible + .dvf-switch{box-shadow:0 0 0 3px rgba(216,179,60,.3)}
+
+  .dvf-cta-calc{
+    width:100%;margin-top:6px;padding:14px;border:none;border-radius:11px;cursor:pointer;
+    background:var(--or);color:var(--noir);font-family:inherit;font-weight:700;font-size:14.5px;
+    letter-spacing:.01em;transition:.15s;
+  }
+  .dvf-cta-calc:hover{background:var(--or-clair)}
+  .dvf-cta-calc:active{transform:translateY(1px)}
+
+  /* Coordonnées + consentement */
+  .dvf-contact-block{margin-top:6px;padding-top:17px;border-top:1px solid var(--ligne)}
+  .dvf-contact-block input{margin-top:9px}
+  .dvf-consent{display:flex;gap:9px;align-items:flex-start;margin-top:11px;font-size:12px;color:var(--gris-fort);line-height:1.45;cursor:pointer}
+  .dvf-consent input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--or)}
+  .dvf-consent a{color:var(--gris-fort)}
+  .dvf-err{color:#b4452f;font-size:12.5px;font-weight:600;margin:12px 0 0;min-height:0}
+  .dvf-err:empty{margin:0}
+  .dvf-rgpd{font-size:10.5px;color:var(--gris);text-align:center;margin-top:9px;line-height:1.4}
+
+  /* Confirmation après envoi */
+  .dvf-confirm{opacity:0;transform:translateY(8px);animation:dvfIn .4s ease forwards}
+  .dvf-confirm .tick{width:46px;height:46px;border-radius:50%;background:#eef7f0;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .dvf-confirm h2{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;line-height:1.2;margin-bottom:8px}
+  .dvf-confirm .sub{font-size:13.5px;color:var(--gris-fort);line-height:1.55;margin-bottom:6px}
+  .dvf-confirm .sub b{color:var(--noir)}
+
+  /* ---------- Résultat ---------- */
+  .dvf-empty{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--gris);min-height:300px}
+  .dvf-empty svg{margin-bottom:14px;opacity:.5}
+  .dvf-empty p{font-size:13.5px;max-width:26ch;line-height:1.5}
+
+  .dvf-out{opacity:0;transform:translateY(8px);animation:dvfIn .4s ease forwards}
+  @keyframes dvfIn{to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.dvf-out{animation:none;opacity:1;transform:none}}
+
+  .dvf-out .lab-small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gris);font-weight:600}
+  .dvf-price{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:40px;line-height:1;letter-spacing:-.02em;margin:8px 0 4px}
+  .dvf-price small{font-size:21px;color:var(--gris);font-weight:400}
+
+  /* barre de fourchette */
+  .dvf-range{margin:20px 0 6px}
+  .dvf-bar{height:8px;border-radius:99px;background:linear-gradient(90deg,#efe8d4,var(--or),#efe8d4);position:relative}
+  .dvf-bar .mid{position:absolute;top:50%;left:50%;width:15px;height:15px;border-radius:50%;background:var(--noir);border:3px solid var(--or);transform:translate(-50%,-50%)}
+  .dvf-range-vals{display:flex;justify-content:space-between;margin-top:9px;font-size:13px;color:var(--gris-fort);font-weight:600}
+  .dvf-range-vals .c{color:var(--noir)}
+
+  .dvf-break{margin-top:22px;border-top:1px solid var(--ligne);padding-top:16px}
+  .dvf-break h3{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gris);font-weight:600;margin-bottom:12px}
+  .dvf-line{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;padding:5px 0;gap:14px}
+  .dvf-line span:first-child{color:var(--gris-fort)}
+  .dvf-line span:last-child{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .dvf-line.plus span:last-child{color:#1f7a4d}
+  .dvf-line.minus span:last-child{color:#b4452f}
+
+  .dvf-note{margin-top:14px;background:#fbf6e8;border:1px solid #efe1b8;border-radius:10px;padding:12px 13px;font-size:12.5px;line-height:1.5;color:var(--gris-fort)}
+  .dvf-note strong{color:var(--noir)}
+
+  .dvf-contact{margin-top:18px;background:var(--noir);border-radius:13px;padding:18px;color:#fff}
+  .dvf-contact p{font-size:13px;color:#cfccc4;line-height:1.5;margin-bottom:13px}
+  .dvf-contact .who{font-family:'Fraunces',serif;color:#fff;font-size:15px;font-weight:500;margin-bottom:2px}
+  .dvf-contact-actions{display:flex;gap:9px;flex-wrap:wrap}
+  .dvf-contact a{flex:1 1 auto;text-align:center;text-decoration:none;padding:11px 14px;border-radius:9px;font-size:13.5px;font-weight:600;transition:.15s;white-space:nowrap}
+  .dvf-contact a.gold{background:var(--or);color:var(--noir)}
+  .dvf-contact a.gold:hover{background:var(--or-clair)}
+  .dvf-contact a.ghost{border:1px solid #3a3a36;color:#fff}
+  .dvf-contact a.ghost:hover{border-color:var(--or);color:var(--or)}
+
+  .dvf-foot{padding:14px 30px;background:#fff;border-top:1px solid var(--ligne);font-size:11px;color:var(--gris);line-height:1.5}
+  .dvf-foot b{color:var(--gris-fort);font-weight:600}
+
+  /* ---------- Autocomplétion adresse ---------- */
+  .dvf-ac{position:relative}
+  .dvf-ac-list{position:absolute;left:0;right:0;top:calc(100% + 5px);background:#fff;border:1px solid var(--ligne);border-radius:11px;box-shadow:var(--ombre);z-index:30;overflow:hidden;display:none}
+  .dvf-ac-list.on{display:block}
+  .dvf-ac-item{padding:10px 13px;font-size:13.5px;cursor:pointer;border-bottom:1px solid #f1ede2;color:var(--noir)}
+  .dvf-ac-item:last-child{border-bottom:none}
+  .dvf-ac-item:hover,.dvf-ac-item.hl{background:#faf6e9}
+  .dvf-ac-item small{display:block;color:var(--gris);font-size:11.5px;margin-top:1px}
+  .dvf-addr-status{font-size:11.5px;margin-top:7px;color:var(--gris);line-height:1.4}
+  .dvf-addr-status.ok{color:#1f7a4d;font-weight:600}
+  .dvf-addr-status.warn{color:#b4452f;font-weight:600}
+  .dvf-manuel-link{display:inline-block;margin-top:8px;font-size:12px;color:var(--gris);text-decoration:underline;cursor:pointer}
+  .dvf-manuel-link:hover{color:var(--noir)}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:760px){
+    .dvf-body{grid-template-columns:1fr}
+    .dvf-form{border-right:none;border-bottom:1px solid var(--ligne);padding:22px 18px}
+    .dvf-result{padding:22px 18px}
+    .dvf-head{padding:22px 18px 20px}
+    .dvf-social{padding:10px 16px;font-size:12px}
+    .dvf-foot{padding:12px 18px}
+    .dvf-head h1{font-size:23px}
+    .dvf-price{font-size:34px}
+    .dvf-row{grid-template-columns:1fr}
+    .dvf-contact-actions{flex-direction:column}
+    .dvf-contact-actions a{flex:1 1 100%}
+    /* 16px = pas de zoom automatique iOS au focus d'un champ */
+    .dvf-app select,.dvf-app input{font-size:16px}
+  }
+  @media(max-width:420px){
+    .dvf-app{border-radius:12px}
+    .dvf-head h1{font-size:21px}
+    .dvf-head p{font-size:13px}
+    .dvf-expert{gap:11px}
+    .dvf-avatar{width:48px;height:48px}
+    .dvf-badges span{font-size:10.5px;padding:4px 9px}
+    .dvf-quote{font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+
+<div class="dvf-app" id="dvfApp">
+  <header class="dvf-head">
+    <div class="dvf-eyebrow">Estimation offerte</div>
+    <h1>Estimez votre bien en 2 minutes</h1>
+    <p>Une fourchette de prix fondée sur les ventes réelles enregistrées près de chez vous (données DVF). Le prix juste, lui, s'affine ensemble lors d'une courte visite.</p>
+    <div class="dvf-badges">
+      <span>✓ 100 % gratuit</span>
+      <span>✓ Sans engagement</span>
+      <span>✓ Ventes DVF réelles</span>
+    </div>
+    <div class="dvf-expert">
+      <img class="dvf-avatar" src="https://cdn.prod.website-files.com/65fda99a9719b665bb3722a7/6a3fa17b0eba33c0246c0436_TETE.png" alt="David Regnery" onerror="this.style.display='none'">
+      <div class="dvf-expert-txt">
+        <p class="dvf-quote">« Un bien au juste prix se vend. Je pars des ventes réelles de votre rue, puis j'affine sur place — c'est là que se joue la différence. »</p>
+        <p class="dvf-expert-name">David Regnery — conseiller immobilier <span class="dvf-google">· ★ 5/5 · 75 avis Google</span></p>
+      </div>
+    </div>
+  </header>
+
+  <div class="dvf-social">
+    <span class="dvf-stars">★★★★★</span>
+    Rejoignez les propriétaires qui ont déjà fait estimer leur bien avec moi.
+  </div>
+
+  <div class="dvf-body">
+    <!-- ============ FORMULAIRE ============ -->
+    <div class="dvf-form">
+
+      <div class="dvf-field" id="f-adresse">
+        <label class="dvf-lab" for="adresse">Adresse du bien</label>
+        <div class="dvf-ac">
+          <input type="text" id="adresse" autocomplete="off" placeholder="ex. 12 rue des Alpes, Saint-Égrève">
+          <div class="dvf-ac-list" id="acList"></div>
+        </div>
+        <div class="dvf-addr-status" id="addrStatus"></div>
+        <a href="#" id="lienManuel" class="dvf-manuel-link">Adresse introuvable ? Choisir la commune</a>
+        <select id="communeManuel" style="display:none;margin-top:9px">
+          <option value="">Sélectionnez votre commune…</option>
+        </select>
+      </div>
+
+      <div class="dvf-field">
+        <label class="dvf-lab">Type de bien</label>
+        <div class="dvf-seg" id="typeSeg">
+          <div class="dvf-chip on" data-type="maison">Maison</div>
+          <div class="dvf-chip" data-type="appartement">Appartement</div>
+        </div>
+      </div>
+
+      <!-- Surface + pièces (maison/appart) -->
+      <div class="dvf-row" data-show="maison appartement" id="f-surface">
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="surface">Surface <span class="dvf-hint">(m²)</span></label>
+          <input type="number" id="surface" min="8" max="800" placeholder="ex. 90">
+        </div>
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="pieces">Pièces</label>
+          <input type="number" id="pieces" min="1" max="20" placeholder="ex. 4">
+        </div>
+      </div>
+
+      <!-- Critères qualitatifs (maison + appartement) -->
+      <div class="dvf-row" data-show="maison appartement" id="f-maison-q1">
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="m_etat">État</label>
+          <select id="m_etat">
+            <option value="-550">🚛 Rénovation lourde</option>
+            <option value="-380">🚧 À refaire</option>
+            <option value="-180">🍩 À rafraîchir</option>
+            <option value="0" selected>➖ Standard</option>
+            <option value="300">✨ Refait à neuf</option>
+          </select>
+        </div>
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="m_lumi">Luminosité</label>
+          <select id="m_lumi">
+            <option value="1.01">☀️ Très lumineuse</option>
+            <option value="1.005">🌤️ Lumineuse</option>
+            <option value="1" selected>➖ Standard</option>
+            <option value="0.99">🌥️ Peu lumineuse</option>
+          </select>
+        </div>
+      </div>
+      <div class="dvf-row" data-show="maison appartement" id="f-maison-q2">
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="m_vue">Vue</label>
+          <select id="m_vue">
+            <option value="0.985">🏢 Vis-à-vis (&lt;10m)</option>
+            <option value="1" selected>➖ Standard</option>
+            <option value="1.015">🏡 Dégagée</option>
+            <option value="1.03">🌊 D'exception</option>
+          </select>
+        </div>
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="m_bruit">Bruit</label>
+          <select id="m_bruit">
+            <option value="0.98">💥 Très bruyant</option>
+            <option value="0.99">🔊 Bruyant</option>
+            <option value="1" selected>🌫️ Calme</option>
+            <option value="1.01">🌳 Très calme</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Chambres (deux types) + Étage (appartement) -->
+      <div class="dvf-row" data-show="maison appartement" id="f-ch-etage">
+        <div class="dvf-field" style="margin-bottom:0">
+          <label class="dvf-lab" for="chambres">Chambres</label>
+          <input type="number" id="chambres" min="0" max="12" placeholder="ex. 3">
+        </div>
+        <div class="dvf-field" data-show="appartement" style="margin-bottom:0">
+          <label class="dvf-lab" for="etage">Étage</label>
+          <input type="number" id="etage" min="0" max="40" placeholder="ex. 2">
+        </div>
+      </div>
+
+      <!-- Terrain (maison) -->
+      <div class="dvf-field" data-show="maison" id="f-terrain-maison">
+        <label class="dvf-lab" for="terrainM">Surface du terrain <span class="dvf-hint">(parcelle totale, m²)</span></label>
+        <input type="number" id="terrainM" min="0" max="20000" placeholder="ex. 600">
+      </div>
+
+      <!-- Potentiel du terrain : apparaît au-delà de 500 m² -->
+      <div class="dvf-field" data-show="maison" id="f-potentiel" style="display:none">
+        <label class="dvf-lab">Potentiel du terrain <span class="dvf-hint">(parcelle &gt; 500 m²)</span></label>
+        <div class="dvf-seg" id="potSeg">
+          <div class="dvf-chip on" data-pot="jardin">Jardin d'agrément</div>
+          <div class="dvf-chip" data-pot="divisible">Divisible (lot à bâtir)</div>
+        </div>
+        <div id="f-detachable" style="display:none;margin-top:11px">
+          <label class="dvf-lab" for="detach">Surface détachable estimée <span class="dvf-hint">(m² constructibles)</span></label>
+          <input type="number" id="detach" min="0" max="10000" placeholder="laisser vide = estimation auto">
+        </div>
+      </div>
+
+      <!-- Terrain (type terrain) -->
+      <div class="dvf-field" data-show="terrain" id="f-terrain-seul">
+        <label class="dvf-lab" for="terrainS">Surface du terrain <span class="dvf-hint">(m²)</span></label>
+        <input type="number" id="terrainS" min="0" max="50000" placeholder="ex. 800">
+      </div>
+      <div class="dvf-field" data-show="terrain" id="f-constructible">
+        <label class="dvf-lab">Constructibilité</label>
+        <div class="dvf-seg" id="constrSeg">
+          <div class="dvf-chip on" data-c="1">Constructible</div>
+          <div class="dvf-chip" data-c="0.35">Non constructible</div>
+        </div>
+      </div>
+
+      <!-- Garage (type garage) -->
+      <div class="dvf-field" data-show="garage" id="f-garage-type">
+        <label class="dvf-lab">Type de stationnement</label>
+        <div class="dvf-seg" id="garageSeg">
+          <div class="dvf-chip on" data-g="box">Box fermé</div>
+          <div class="dvf-chip" data-g="place">Place / extérieur</div>
+        </div>
+      </div>
+
+      <!-- Annexes (appartement uniquement) -->
+      <div class="dvf-field" data-show="appartement" id="f-annexes">
+        <label class="dvf-lab">Annexes & extérieurs</label>
+        <div class="dvf-seg" style="margin-bottom:10px">
+          <label class="dvf-toggle" style="flex:1"><input type="checkbox" id="aGarage"><span class="dvf-switch"></span>Garage / box</label>
+          <label class="dvf-toggle" style="flex:1"><input type="checkbox" id="aParking"><span class="dvf-switch"></span>Parking</label>
+        </div>
+        <div class="dvf-seg">
+          <label class="dvf-toggle" style="flex:1"><input type="checkbox" id="aTerrasse"><span class="dvf-switch"></span>Terrasse</label>
+          <label class="dvf-toggle" style="flex:1"><input type="checkbox" id="aAscenseur"><span class="dvf-switch"></span>Ascenseur</label>
+        </div>
+      </div>
+      <div class="dvf-field" data-show="appartement" id="f-terrasse-surf" style="display:none">
+        <label class="dvf-lab" for="terrasseSurf">Surface de la terrasse <span class="dvf-hint">(m²)</span></label>
+        <input type="number" id="terrasseSurf" min="0" max="300" placeholder="ex. 15">
+      </div>
+
+      <!-- Coordonnées (obligatoires) -->
+      <div class="dvf-contact-block">
+        <label class="dvf-lab">Vos coordonnées <span class="dvf-hint">pour recevoir le rapport</span></label>
+        <input type="text"  id="leadNom"   placeholder="Nom et prénom *">
+        <input type="email" id="leadEmail" placeholder="Email *" autocomplete="email">
+        <input type="tel"   id="leadTel"   placeholder="Téléphone *" autocomplete="tel">
+        <label class="dvf-consent">
+          <input type="checkbox" id="leadConsent">
+          <span>J'accepte d'être recontacté(e) par David Regnery au sujet de mon estimation et j'ai lu la <a href="https://www.davidregneryimmobilier.com/politique-confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span>
+        </label>
+      </div>
+
+      <div class="dvf-err" id="formErr"></div>
+      <button class="dvf-cta-calc" id="btnCalc">Recevoir mon rapport par email</button>
+      <p class="dvf-rgpd">Vos données servent uniquement à établir et vous transmettre cette estimation. Aucun engagement.</p>
+    </div>
+
+    <!-- ============ RÉSULTAT ============ -->
+    <div class="dvf-result" id="resultPanel">
+      <div class="dvf-empty" id="emptyState">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#b9b2a0" stroke-width="1.4"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9 21v-6h6v6"/></svg>
+        <p>Renseignez votre bien puis lancez l'estimation pour voir la fourchette de prix.</p>
+      </div>
+      <div id="outState" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="dvf-foot">
+    <b>Méthode :</b> estimation indicative fondée sur la valeur médiane au m² des ventes DVF (DGFiP / data.gouv.fr) de votre commune, ajustée selon les caractéristiques saisies. Elle ne tient pas compte de l'emplacement précis, de l'exposition, du DPE ni du potentiel foncier d'une parcelle — autant d'éléments qu'une visite permet d'affiner. Ce n'est pas une expertise réglementée.
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DONNÉES DVF — médianes €/m² par commune et type de bien.
+   Régénérables avec le script Python "generer_donnees_dvf.py".
+   ============================================================ */
+const DONNEES_DVF = {
+  _meta:{ source:"DVF DGFiP — geo-dvf Etalab (data.gouv.fr)", periode:"ventes 2024–2025", maj:"2026-06" },
+  communes:{
+    "38382":{nom:"Saint-Égrève",        appartement:2800, maison:3900, terrain:300, n_app:118, n_mai:46},
+    "38423":{nom:"Saint-Martin-le-Vinoux",appartement:2600, maison:3550, terrain:320, n_app:74,  n_mai:22},
+    "38170":{nom:"Le Fontanil-Cornillon",appartement:2950, maison:3950, terrain:330, n_app:31,  n_mai:24},
+    "38474":{nom:"Sassenage",           appartement:2650, maison:3600, terrain:300, n_app:96,  n_mai:38},
+    "38565":{nom:"Voreppe",             appartement:2600, maison:3500, terrain:290, n_app:61,  n_mai:34},
+    "38281":{nom:"Noyarey",             appartement:2600, maison:3650, terrain:300, n_app:18,  n_mai:21},
+    "38258":{nom:"Mont-Saint-Martin",   appartement:2700, maison:3800, terrain:320, n_app:6,   n_mai:9},
+    "38113":{nom:"Veurey-Voroize",      appartement:2550, maison:3450, terrain:280, n_app:9,   n_mai:14},
+    "38328":{nom:"Quaix-en-Chartreuse", appartement:2600, maison:3300, terrain:250, n_app:4,   n_mai:11},
+    "38185":{nom:"Grenoble",            appartement:2450, maison:3600, terrain:360, n_app:1600,n_mai:120},
+    "38169":{nom:"Fontaine",            appartement:1900, maison:3000, terrain:250, n_app:210, n_mai:60}
+  }
+};
+
+/* ============================================================
+   PARAMÈTRES DU MODÈLE (transparents, faciles à ajuster)
+   ============================================================ */
+const P = {
+  fourchette:0.07,          // ±7 % autour de l'estimation centrale
+  terrainRef:500,           // m² de parcelle "inclus" dans le €/m² maison (seuil)
+  // --- jardin d'agrément : valeur dégressive du terrain au-delà de 500 m² ---
+  jardin:[ [300,0.35], [700,0.12], [Infinity,0.04] ], // [m² supplémentaires, part du €/m² terrain]
+  // --- lot détachable (terrain constructible / divisible) ---
+  coefDivision:0.78,        // décote sur le lot à bâtir (bornage, viabilisation, accès, aléa PLU, délais)
+  loConserveMaison:400,     // m² de parcelle qu'on conserve par défaut autour de la maison
+  lotMin:300,               // taille minimale indicative d'un lot constructible
+  // --- effet "petite / grande surface" sur le €/m² bâti ---
+  refSurf:{maison:105, appartement:62},
+  kSurf:{maison:0.10, appartement:0.13},
+  bornesSurf:[-0.09,0.10],  // borne de l'ajustement surface
+  // --- terrain seul : dégressivité du €/m² selon la taille ---
+  refTerrain:700, kTerrain:0.09, bornesTerrain:[-0.18,0.12],
+  balconPct:0.025,          // +2,5 % pour un balcon (appartement)
+  terrassePart:0.30,        // valeur terrasse = surface × €/m² type × 0,30
+  garageBase:13000,         // box, ajusté par commune
+  parkingBase:8000          // place, ajusté par commune
+};
+
+/* ============================================================
+   CONFIGURATION DU MODÈLE SPATIAL (adresse + ventes voisines)
+   ============================================================ */
+const CONFIG = {
+  // Fichier des ventes géolocalisées généré par generer_donnees_dvf.py.
+  // À héberger (asset Webflow ou autre) puis renseigner l'URL absolue ici.
+  ventesURL:"ventes_dvf.json",
+  // Endpoint qui reçoit le lead et déclenche l'envoi des emails (Make/Zapier/Formspree/Brevo…).
+  // Laisser vide pour tester sans envoi (mode démo : confirmation affichée, données en console).
+  leadEndpoint:"https://estimation-replay.dregnery.workers.dev",
+  geoMin:5,            // nb effectif de comparables requis pour un prix "adresse"
+  rayons:[600,1000,1600], // m : rayons d'élargissement successifs
+  sigma:350,           // m : largeur du noyau gaussien de distance
+  tauRecence:3,        // années : décroissance de l'influence avec l'ancienneté
+  bandeSurface:0.45    // comparer en priorité aux biens ±45 % de surface
+};
+
+/* ---------- État du formulaire ---------- */
+let typeBien='maison', constrCoef=1, garageType='box', potentiel='jardin';
+let adresseSel=null;   // {lat,lon,citycode,label,commune}
+let VENTES=null;       // nuage de ventes géolocalisées (chargé en tâche de fond)
+
+/* ---------- Chargement du nuage de ventes ---------- */
+(async function chargerVentes(){
+  try{
+    const r=await fetch(CONFIG.ventesURL,{cache:'force-cache'});
+    if(r.ok){VENTES=await r.json();}
+  }catch(e){/* on retombera sur les médianes communales */}
+})();
+
+/* ---------- Autocomplétion d'adresse (Base Adresse Nationale) ---------- */
+const adrInput=document.getElementById('adresse');
+const acList=document.getElementById('acList');
+let acItems=[], acHL=-1, acTimer=null;
+
+adrInput.addEventListener('input',()=>{
+  adresseSel=null; setAddrStatus('');
+  const q=adrInput.value.trim();
+  clearTimeout(acTimer);
+  if(q.length<4){fermerAC();return;}
+  acTimer=setTimeout(()=>rechercherAdresse(q),250);
+});
+adrInput.addEventListener('keydown',e=>{
+  if(!acList.classList.contains('on'))return;
+  if(e.key==='ArrowDown'){e.preventDefault();acHL=Math.min(acHL+1,acItems.length-1);majHL();}
+  else if(e.key==='ArrowUp'){e.preventDefault();acHL=Math.max(acHL-1,0);majHL();}
+  else if(e.key==='Enter'){e.preventDefault();if(acHL>=0)choisirAdresse(acHL);}
+  else if(e.key==='Escape'){fermerAC();}
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.dvf-ac'))fermerAC();});
+
+async function rechercherAdresse(q){
+  setAddrStatus('Recherche…');
+  try{
+    const url='https://api-adresse.data.gouv.fr/search/?limit=6&autocomplete=1&q='+encodeURIComponent(q);
+    const r=await fetch(url);
+    if(!r.ok) throw new Error('http '+r.status);
+    const d=await r.json();
+    acItems=(d.features||[]).filter(f=>f.properties.type!=='municipality');
+    if(!acItems.length){setAddrStatus('Aucune adresse trouvée — affinez ou choisissez la commune ci-dessous.');revelerManuel();fermerAC();return;}
+    setAddrStatus('');
+    afficherAC();
+  }catch(e){
+    setAddrStatus("Recherche d'adresse indisponible ici (normal dans l'aperçu) — choisissez la commune.",'warn');
+    revelerManuel();
+    fermerAC();
+  }
+}
+function afficherAC(){
+  if(!acItems.length){fermerAC();return;}
+  acList.innerHTML=acItems.map((f,i)=>{
+    const p=f.properties;
+    return '<div class="dvf-ac-item" data-i="'+i+'">'+p.name+'<small>'+p.postcode+' '+p.city+'</small></div>';
+  }).join('');
+  acList.classList.add('on'); acHL=-1;
+  acList.querySelectorAll('.dvf-ac-item').forEach(el=>el.addEventListener('click',()=>choisirAdresse(parseInt(el.dataset.i))));
+}
+function fermerAC(){acList.classList.remove('on');acList.innerHTML='';acItems=[];acHL=-1;}
+function majHL(){acList.querySelectorAll('.dvf-ac-item').forEach((el,i)=>el.classList.toggle('hl',i===acHL));}
+
+function choisirAdresse(i){
+  const f=acItems[i],p=f.properties,[lon,lat]=f.geometry.coordinates;
+  adresseSel={lat,lon,citycode:p.citycode,label:p.label,commune:p.city,manual:false};
+  adrInput.value=p.label; fermerAC();
+  if(DONNEES_DVF.communes[p.citycode]) setAddrStatus('✓ '+p.label,'ok');
+  else setAddrStatus('Cette commune n\'est pas encore couverte. Ajoutez-la dans le script DVF pour l\'activer.','warn');
+}
+function setAddrStatus(t,cls){const s=document.getElementById('addrStatus');s.textContent=t;s.className='dvf-addr-status'+(cls?' '+cls:'');}
+
+/* ---------- Repli manuel par commune (aperçu, ou adresse introuvable) ---------- */
+const communeManuel=document.getElementById('communeManuel');
+Object.entries(DONNEES_DVF.communes)
+  .sort((a,b)=>a[1].nom.localeCompare(b[1].nom))
+  .forEach(([code,c])=>{const o=document.createElement('option');o.value=code;o.textContent=c.nom;communeManuel.appendChild(o);});
+
+function revelerManuel(){
+  document.getElementById('communeManuel').style.display='block';
+  document.getElementById('lienManuel').style.display='none';
+}
+document.getElementById('lienManuel').addEventListener('click',e=>{e.preventDefault();revelerManuel();});
+communeManuel.addEventListener('change',()=>{
+  const code=communeManuel.value;
+  if(!code){adresseSel=null;return;}
+  const c=DONNEES_DVF.communes[code];
+  adresseSel={citycode:code,commune:c.nom,manual:true};
+  setAddrStatus('✓ '+c.nom+' — estimation au prix communal (sans précision adresse).','ok');
+});
+
+/* ---------- Chips ---------- */
+function setChips(segId,attr,cb){
+  document.querySelectorAll('#'+segId+' .dvf-chip').forEach(ch=>{
+    ch.addEventListener('click',()=>{
+      ch.parentElement.querySelectorAll('.dvf-chip').forEach(x=>x.classList.remove('on'));
+      ch.classList.add('on');cb(ch.dataset[attr]);
+    });
+  });
+}
+setChips('typeSeg','type',v=>{typeBien=v;refreshFields();majPotentiel();});
+setChips('constrSeg','c',v=>constrCoef=parseFloat(v));
+setChips('garageSeg','g',v=>garageType=v);
+setChips('potSeg','pot',v=>{
+  potentiel=v;
+  document.getElementById('f-detachable').style.display=(v==='divisible')?'block':'none';
+});
+
+// Affiche le bloc "potentiel" seulement pour une maison avec terrain > 500 m²
+function majPotentiel(){
+  const t=parseFloat(document.getElementById('terrainM').value)||0;
+  const montrer=(typeBien==='maison' && t>500);
+  document.getElementById('f-potentiel').style.display=montrer?'block':'none';
+  if(!montrer){
+    potentiel='jardin';
+    document.querySelectorAll('#potSeg .dvf-chip').forEach(x=>x.classList.toggle('on',x.dataset.pot==='jardin'));
+    document.getElementById('f-detachable').style.display='none';
+  }
+}
+document.getElementById('terrainM').addEventListener('input',majPotentiel);
+
+function refreshFields(){
+  document.querySelectorAll('[data-show]').forEach(el=>{
+    el.classList.toggle('hidden',!el.dataset.show.split(' ').includes(typeBien));
+  });
+}
+refreshFields();
+
+document.getElementById('aTerrasse').addEventListener('change',e=>{
+  document.getElementById('f-terrasse-surf').style.display=e.target.checked?'block':'none';
+});
+
+/* ---------- Helpers ---------- */
+const eur=n=>Math.round(n).toLocaleString('fr-FR')+' €';
+const round1k=n=>Math.round(n/1000)*1000;
+const val=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v;};
+const chk=id=>document.getElementById(id).checked;
+
+// Effet "petite / grande surface" sur le €/m² : un studio se vend plus cher au m²
+// qu'un grand appartement ; idem maison. Coefficient borné.
+function effetSurface(type,surface){
+  const ref=P.refSurf[type], k=P.kSurf[type];
+  let cf=k*Math.log(ref/surface);
+  return Math.max(P.bornesSurf[0],Math.min(P.bornesSurf[1],cf));
+}
+// Valeur dégressive du terrain "jardin" au-delà du seuil (agrément, non bâtissable)
+function valeurJardin(surplus,prixTerrain){
+  let reste=surplus, v=0;
+  for(const [tranche,part] of P.jardin){
+    const m=Math.min(reste,tranche);
+    v+=m*prixTerrain*part; reste-=m;
+    if(reste<=0)break;
+  }
+  return v;
+}
+
+/* ---------- Modèle spatial : prix local à partir des ventes voisines ---------- */
+function haversine(la1,lo1,la2,lo2){
+  const R=6371000,r=Math.PI/180;
+  const dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function nEffectif(comps){ // taille d'échantillon effective de Kish
+  let sw=0,sw2=0; for(const c of comps){sw+=c.w;sw2+=c.w*c.w;}
+  return sw2>0?(sw*sw)/sw2:0;
+}
+function medianePonderee(comps){
+  const a=comps.slice().sort((x,y)=>x.pm2-y.pm2);
+  const tot=a.reduce((s,x)=>s+x.w,0); let acc=0;
+  for(const x of a){acc+=x.w; if(acc>=tot/2)return x.pm2;}
+  return a[a.length-1].pm2;
+}
+// Renvoie {pm2, n, neff, rayon, source}
+function prixLocal(tcode,surface,lat,lon,c){
+  const fb = tcode==='m'? c.maison : c.appartement;
+  if(!VENTES||!VENTES.ventes||!VENTES.ventes.length) return {pm2:fb,source:'commune'};
+  const anneeRef=(VENTES._meta&&VENTES._meta.annee_ref)||2025;
+  const sMin=surface*(1-CONFIG.bandeSurface), sMax=surface*(1+CONFIG.bandeSurface);
+  const pool=VENTES.ventes.filter(v=>v.t===tcode);
+  for(let ri=0; ri<CONFIG.rayons.length; ri++){
+    const rayon=CONFIG.rayons[ri], comps=[];
+    for(const v of pool){
+      const d=haversine(lat,lon,v.lat,v.lon);
+      if(d>rayon)continue;
+      const wD=Math.exp(-(d*d)/(2*CONFIG.sigma*CONFIG.sigma));
+      const wR=Math.exp(-Math.max(0,anneeRef-v.y)/CONFIG.tauRecence);
+      const wS=(v.s>=sMin&&v.s<=sMax)?1:0.4;
+      comps.push({pm2:v.p, w:wD*wR*wS});
+    }
+    const neff=nEffectif(comps);
+    if(neff>=CONFIG.geoMin || ri===CONFIG.rayons.length-1){
+      if(comps.length>=3 && neff>=3)
+        return {pm2:Math.round(medianePonderee(comps)/10)*10, n:comps.length, neff:Math.round(neff), rayon, source:'adresse'};
+      return {pm2:fb, source:'commune'};
+    }
+  }
+  return {pm2:fb, source:'commune'};
+}
+
+/* ============================================================
+   MOTEUR D'ESTIMATION
+   ============================================================ */
+function calculer(){
+  if(!adresseSel) return {error:"Saisissez l'adresse du bien (ou choisissez la commune)."};
+  const code=adresseSel.citycode;
+  const c=DONNEES_DVF.communes[code];
+  if(!c) return {error:"Commune pas encore couverte. Ajoutez-la dans le script DVF pour l'activer."};
+  const lignes=[]; let central=0; let nVentes=0; let pm2=0; let footnote=null;
+
+  if(typeBien==='garage'){
+    const fac=Math.min(1.3,Math.max(0.8,c.maison/3600));
+    central=(garageType==='box'?P.garageBase:P.parkingBase)*fac;
+    lignes.push(['Référence '+(garageType==='box'?'box fermé':'place de parking')+' · '+c.nom,eur(central),'']);
+    return {central,lignes,c,type:null,
+      note:(garageType==='box'
+        ?"La valeur d'un box varie fortement selon l'accès, la sécurité et la tension locale du quartier."
+        :"Une place varie selon qu'elle soit couverte, en sous-sol ou en extérieur."),footnote:null};
+  }
+
+  if(typeBien==='terrain'){
+    const s=val('terrainS');
+    if(s<=0) return {error:"Indiquez la surface du terrain."};
+    const valBase=s*c.terrain;
+    lignes.push([s.toLocaleString('fr-FR')+' m² × '+eur(c.terrain)+'/m²',eur(valBase),'']);
+    central=valBase;
+    let cfT=P.kTerrain*Math.log(P.refTerrain/s);
+    cfT=Math.max(P.bornesTerrain[0],Math.min(P.bornesTerrain[1],cfT));
+    if(Math.abs(cfT)>0.01){const d=valBase*cfT;central+=d;
+      lignes.push([cfT<0?'Décote grande surface':'Petit terrain',(d>=0?'+ ':'– ')+eur(Math.abs(d)),d>=0?'plus':'minus']);}
+    if(constrCoef!==1){const d=central*(constrCoef-1);central+=d;
+      lignes.push(['Terrain non constructible',(d>=0?'+ ':'– ')+eur(Math.abs(d)),d>=0?'plus':'minus']);}
+    return {central,lignes,c,type:'terrain',
+      note:"Le prix d'un terrain dépend avant tout du PLU, de la viabilisation, de l'accès et du potentiel de division. <strong>C'est précisément là qu'une analyse parcellaire fait la différence.</strong>",
+      footnote:'Prix de référence : médiane DVF des ventes de terrains de la commune. Les ventes de terrains étant rares, ce repère est plus large qu\'un prix au m² bâti.'};
+  }
+
+  /* --- Maison / Appartement --- */
+  const surface=val('surface');
+  if(surface<=0) return {error:"Indiquez la surface habitable."};
+  const tcode = typeBien==='maison'?'m':'a';
+  const pl = adresseSel.manual
+    ? {pm2:(tcode==='m'?c.maison:c.appartement), source:'commune'}
+    : prixLocal(tcode, surface, adresseSel.lat, adresseSel.lon, c);
+  pm2 = pl.pm2;
+  let base=surface*pm2;
+  const srcTxt = pl.source==='adresse'
+    ? 'prix local · '+pl.neff+' ventes voisines ≤ '+pl.rayon+' m'
+    : 'prix communal · pas assez de ventes proches';
+  lignes.push([surface+' m² × '+eur(pm2)+'/m² ('+srcTxt+')',eur(base),'']);
+  central=base;
+
+  if(pl.source==='adresse'){
+    footnote='Prix au m² reconstitué à partir des ventes DVF les plus proches de l\'adresse, pondérées par distance et récence ('+pl.n+' ventes dans le rayon retenu). Plus fiable qu\'une moyenne de commune, mais reste indicatif.';
+  }else{
+    nVentes = typeBien==='maison'? c.n_mai : c.n_app;
+    footnote='Trop peu de ventes '+(typeBien==='maison'?'de maisons':'d\'appartements')+' à proximité immédiate : repli sur la médiane communale DVF (≈ '+nVentes+' ventes, '+DONNEES_DVF._meta.periode+').';
+  }
+
+  /* Effet surface (le €/m² n'est pas linéaire selon la taille) */
+  const cfSurf=effetSurface(typeBien,surface);
+  if(Math.abs(cfSurf)>0.01){const d=base*cfSurf;central+=d;
+    lignes.push([cfSurf>0?'Effet petite surface':'Effet grande surface',(d>=0?'+ ':'– ')+eur(Math.abs(d)),d>=0?'plus':'minus']);}
+
+  /* Critères qualitatifs (maison + appartement) */
+  // État : ajustement en €/m² (montant absolu de rénovation) × surface
+  const dEtat=parseFloat(document.getElementById('m_etat').value)||0;
+  if(dEtat!==0){const d=surface*dEtat;central+=d;
+    lignes.push(['État',(d>=0?'+ ':'– ')+eur(Math.abs(d)),d>=0?'plus':'minus']);}
+  // Luminosité / Vue / Bruit : notés dans le lead, sans effet sur le prix
+
+  /* Agencement (chambres) : maison + appartement */
+  const ch=val('chambres');
+  if(ch>0){
+    const attendu=surface/28;
+    let cf=Math.max(-0.03,Math.min(0.03,(ch-attendu)*0.012));
+    if(Math.abs(cf)>0.004){const d=central*cf;central+=d;
+      lignes.push(['Agencement ('+ch+' ch.)',(d>=0?'+ ':'– ')+eur(Math.abs(d)),d>=0?'plus':'minus']);}
+  }
+
+  /* Étage / ascenseur : notés dans le lead, sans effet sur le prix */
+
+  /* Terrain (maison) — jardin d'agrément vs lot constructible détachable */
+  let noteTerrain=null;
+  if(typeBien==='maison'){
+    const t=val('terrainM');
+    if(t>0){
+      if(t<=P.terrainRef){
+        // petite parcelle : légère décote sous 300 m²
+        if(t<300){const adj=(t-300)*c.terrain*0.20;central+=adj;
+          lignes.push(['Petite parcelle ('+t+' m²)','– '+eur(Math.abs(adj)),'minus']);}
+      }else{
+        const surplus=t-P.terrainRef;
+        if(potentiel==='divisible'){
+          // surface détachable : saisie ou estimation auto (on conserve ~400 m² autour de la maison)
+          let det=val('detach');
+          if(det<=0) det=Math.max(0, t-P.loConserveMaison);
+          det=Math.min(det,surplus);
+          const nbLots=Math.max(1,Math.floor(det/P.lotMin));
+          const valLot=det*c.terrain*P.coefDivision;
+          central+=valLot;
+          lignes.push(['Lot à bâtir détachable ('+Math.round(det)+' m² × '+eur(c.terrain)+'/m² × '+P.coefDivision+')','+ '+eur(valLot),'plus']);
+          const reste=surplus-det;
+          if(reste>30){const vj=valeurJardin(reste,c.terrain);central+=vj;
+            lignes.push(['Reste de jardin ('+Math.round(reste)+' m²)','+ '+eur(vj),'plus']);}
+          noteTerrain="Lot détachable valorisé au prix du terrain à bâtir, avec une décote de "+Math.round((1-P.coefDivision)*100)+
+            " % (bornage, viabilisation, accès, délais et aléa PLU). <strong>"+nbLots+" lot"+(nbLots>1?'s':'')+
+            " envisageable"+(nbLots>1?'s':'')+"</strong> à titre indicatif — la faisabilité réelle dépend du PLU (zonage, emprise, recul, accès) et se valide avec un certificat d'urbanisme. C'est exactement l'analyse que je mène avant une mise en vente.";
+        }else{
+          const vj=valeurJardin(surplus,c.terrain);
+          if(vj>500){central+=vj;
+            lignes.push(['Terrain &gt; 500 m² (jardin, '+Math.round(surplus)+' m²)','+ '+eur(vj),'plus']);}
+          if(t>=800){
+            noteTerrain="Cette parcelle dépasse 500 m² : si le PLU le permet, une <strong>division parcellaire</strong> pourrait en détacher un lot à bâtir et changer nettement la valeur. Basculez sur « Divisible » pour le chiffrer — c'est un potentiel que les outils automatiques ignorent.";
+          }
+        }
+      }
+    }
+  }
+
+  /* Annexes */
+  const fac=Math.min(1.3,Math.max(0.8,pm2/2700));
+  if(chk('aGarage')){const v=P.garageBase*fac;central+=v;lignes.push(['Garage / box','+ '+eur(v),'plus']);}
+  if(chk('aParking')){const v=P.parkingBase*fac;central+=v;lignes.push(['Parking','+ '+eur(v),'plus']);}
+  if(chk('aTerrasse')){const ts=val('terrasseSurf')||10;const v=ts*pm2*P.terrassePart;central+=v;
+    lignes.push(['Terrasse ('+ts+' m²)','+ '+eur(v),'plus']);}
+
+  /* Note potentiel foncier + source du prix */
+  return {central,lignes,c,type:typeBien,note:noteTerrain,footnote};
+}
+
+/* ============================================================
+   CAPTURE DU LEAD + ENVOI DU RAPPORT
+   ============================================================ */
+const reEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function estTel(t){return /^(\+33|0)[1-9]\d{8}$/.test(t.replace(/[ .\-]/g,''));}
+function showFormErr(msg){document.getElementById('formErr').textContent=msg;}
+
+function collectBien(){
+  const b={type:typeBien, commune:adresseSel.commune, citycode:adresseSel.citycode,
+           adresse:adresseSel.label||('('+adresseSel.commune+')'),
+           precision:adresseSel.manual?'commune':'adresse'};
+  if(typeBien==='maison'||typeBien==='appartement'){
+    b.surface_habitable=val('surface');
+    b.pieces=val('pieces')||null;
+    b.chambres=val('chambres')||null;
+    const opt=id=>document.querySelector('#'+id+' option:checked').textContent.trim();
+    b.etat=opt('m_etat'); b.luminosite=opt('m_lumi'); b.vue=opt('m_vue'); b.bruit=opt('m_bruit');
+    if(typeBien==='maison'){
+      b.surface_terrain=val('terrainM')||null;
+      if(val('terrainM')>500) b.potentiel_terrain=potentiel;
+    }
+    if(typeBien==='appartement'){
+      b.etage=val('etage');
+      b.ascenseur=chk('aAscenseur');
+      b.garage=chk('aGarage'); b.parking=chk('aParking'); b.terrasse=chk('aTerrasse');
+    }
+  }else if(typeBien==='terrain'){
+    b.surface_terrain=val('terrainS');
+    b.constructibilite=document.querySelector('#constrSeg .dvf-chip.on').textContent.trim();
+  }else if(typeBien==='garage'){
+    b.stationnement=garageType;
+  }
+  return b;
+}
+
+function buildReport(lead,res,low,mid,high){
+  const prenom=(lead.nom||"").split(" ")[0]||lead.nom;
+  const adresse=(adresseSel&&adresseSel.label)?adresseSel.label:res.c.nom;
+  const atouts=(res.type==='maison')
+    ? "la vue, la luminosité, l'état réel, l'ambiance de la rue, et le potentiel de votre terrain selon la zone…"
+    : "la vue, la luminosité, l'étage, l'état réel, les matériaux, l'ambiance de la rue…";
+  return ''+
+  '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#101010;line-height:1.6;font-size:14px">'+
+    '<p>Bonjour '+prenom+',</p>'+
+    '<p>Merci d\'avoir pris le temps d\'estimer votre bien situé au <b>'+adresse+'</b>. Voici votre première fourchette de prix, calculée à partir des <b>ventes réelles récemment enregistrées autour de chez vous</b> :</p>'+
+    '<div style="background:#faf8f3;border:1px solid #e6e1d5;border-radius:10px;padding:18px;margin:18px 0;text-align:center">'+
+      '<div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#888">Pré-estimation de marché</div>'+
+      '<div style="font-size:25px;font-weight:bold;margin:7px 0">'+eur(low)+' – '+eur(high)+'</div>'+
+    '</div>'+
+    '<p>C\'est un bon point de départ pour situer votre bien. Mais un chiffre automatique ne raconte pas tout : votre bien a des atouts qu\'aucun calcul ne voit — '+atouts+'</p>'+
+    '<p>C\'est justement là que j\'interviens, et ce qui sépare une simple estimation d\'un <b>véritable avis de valeur</b> — celui sur lequel on fixe le juste prix de vente.</p>'+
+    '<p>Je suis conseiller indépendant sur le secteur depuis plus de 10 ans. <b>Je vous appelle très prochainement</b> pour échanger sur votre projet et, si vous le souhaitez, passer vous remettre un avis de valeur précis et personnalisé — gratuitement et sans engagement.</p>'+
+    '<p>Vous préférez me joindre directement ? Avec plaisir, au <b>06 67 93 45 66</b>.</p>'+
+    '<p style="margin-top:22px">À très vite,</p>'+
+    '<table style="border-collapse:collapse;margin-top:6px"><tr>'+
+      '<td style="padding-right:14px;vertical-align:middle">'+
+        '<img src="https://cdn.prod.website-files.com/65fda99a9719b665bb3722a7/6a3fa17b0eba33c0246c0436_TETE.png" width="58" height="58" alt="David Regnery" style="border-radius:50%;object-fit:cover;display:block;background:#101010">'+
+      '</td>'+
+      '<td style="vertical-align:middle;font-size:13px;line-height:1.5">'+
+        '<b>David Regnery</b><br>Conseiller immobilier<br>'+
+        '<span style="color:#555">06 67 93 45 66 · dregnery@transac-immo.com</span>'+
+      '</td>'+
+    '</tr></table>'+
+    '<p style="font-size:10px;color:#999;line-height:1.4;margin-top:18px">Pré-estimation indicative et non contractuelle, fondée sur les ventes DVF du secteur. Ne constitue pas un avis de valeur.</p>'+
+  '</div>';
+}
+
+function renderConfirmation(lead,res,demo){
+  let pitch;
+  if(res.type==='appartement')
+    pitch="l'état et les travaux, l'isolation et le DPE, l'étage et les nuisances éventuelles, la vue, l'exposition et la luminosité.";
+  else if(res.type==='maison')
+    pitch="l'état, la vue et l'exposition — et surtout votre terrain, dont la valeur peut faire une vraie différence selon la zone et les règles d'urbanisme.";
+  else if(res.type==='terrain')
+    pitch="la constructibilité réelle au regard du PLU, la viabilisation, l'accès, et le potentiel de division en plusieurs lots.";
+  else
+    pitch="l'emplacement précis, l'accès, la sécurité et la demande du quartier.";
+
+  const html=
+   '<div class="dvf-confirm">'+
+     '<div class="tick"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1f7a4d" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg></div>'+
+     '<h2>Merci '+lead.nom+', c\'est noté.</h2>'+
+     '<p class="sub">Votre rapport d\'estimation pour <b>'+res.c.nom+'</b> part vers <b>'+lead.email+'</b>. Vous y trouverez la fourchette issue des ventes réelles du secteur.'+
+       (demo?'<br><em style="color:#b4452f">Mode démo : aucun email réellement envoyé (endpoint non configuré).</em>':'')+'</p>'+
+     '<div class="dvf-note" style="margin-top:14px">'+
+       '<strong>Le vrai prix se décide sur place.</strong> Je me déplace pour évaluer ce qu\'aucun calcul ne voit : '+pitch+
+     '</div>'+
+     '<div class="dvf-contact">'+
+       '<div class="who">David Regnery — conseiller immobilier</div>'+
+       '<p>Disponible pour une visite et un prix juste, sans engagement.</p>'+
+       '<div class="dvf-contact-actions">'+
+         '<a class="gold" href="tel:+33667934566">Appeler le 06 67 93 45 66</a>'+
+         '<a class="ghost" href="https://www.davidregneryimmobilier.com/vendre-a-saint-egreve">Prendre rendez-vous</a>'+
+       '</div>'+
+     '</div>'+
+   '</div>';
+  document.getElementById('emptyState').style.display='none';
+  const out=document.getElementById('outState'); out.style.display='block'; out.innerHTML=html;
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function submitLead(payload){
+  if(!CONFIG.leadEndpoint) return {demo:true};
+  try{
+    const r=await fetch(CONFIG.leadEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    let detail='';
+    try{ const j=await r.json(); detail=j.detail||j.error||''; }catch(e){}
+    return {ok:r.ok, status:r.status, detail};
+  }catch(e){return {ok:false, status:0, detail:String(e)};}
+}
+
+async function onSubmit(){
+  showFormErr('');
+  const res=calculer();
+  if(res.error){showFormErr(res.error);return;}
+  const lead={
+    nom:document.getElementById('leadNom').value.trim(),
+    email:document.getElementById('leadEmail').value.trim(),
+    tel:document.getElementById('leadTel').value.trim(),
+    consent:chk('leadConsent')
+  };
+  if(lead.nom.length<2){showFormErr('Indiquez votre nom et prénom.');return;}
+  if(!reEmail.test(lead.email)){showFormErr('Adresse email invalide.');return;}
+  if(!estTel(lead.tel)){showFormErr('Numéro de téléphone invalide (format français).');return;}
+  if(!lead.consent){showFormErr('Merci de cocher la case de consentement.');return;}
+
+  const low=round1k(res.central*(1-P.fourchette)),
+        high=round1k(res.central*(1+P.fourchette)),
+        mid=round1k(res.central);
+
+  const payload={
+    source:'calculette-dvf', date:new Date().toISOString(),
+    contact:{nom:lead.nom,email:lead.email,telephone:lead.tel,consentement:true},
+    bien:collectBien(),
+    estimation:{basse:low,centrale:mid,haute:high},
+    detail:res.lignes.map(l=>({poste:l[0].replace(/&gt;/g,'>').replace(/<[^>]+>/g,''),montant:l[1]})),
+    rapport_html:buildReport(lead,res,low,mid,high)
+  };
+
+  const btn=document.getElementById('btnCalc');
+  const txt=btn.textContent; btn.disabled=true; btn.textContent='Envoi…';
+  const r=await submitLead(payload);
+  btn.disabled=false; btn.textContent=txt;
+
+  if(r.ok===false){showFormErr("Échec ["+(r.status||'réseau')+"] "+(r.detail||'')+" — réessayez ou appelez le 06 67 93 45 66.");return;}
+  if(r.demo) console.log('[Calculette DVF] Payload lead (mode démo) :',payload);
+  renderConfirmation(lead,res,r.demo);
+}
+
+document.getElementById('btnCalc').addEventListener('click',onSubmit);
+
+/* Iframe auto-ajustable : signale la hauteur au site parent (Webflow) */
+function dvfPostHeight(){
+  try{ parent.postMessage({dvfHeight: document.documentElement.scrollHeight}, '*'); }catch(e){}
+}
+window.addEventListener('load', dvfPostHeight);
+window.addEventListener('resize', dvfPostHeight);
+if(window.ResizeObserver){ new ResizeObserver(dvfPostHeight).observe(document.body); }
+</script>
+</body>
+</html>
