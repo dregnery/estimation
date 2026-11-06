@@ -231,12 +231,29 @@
     .dvf-badges span{font-size:10.5px;padding:4px 9px}
     .dvf-quote{font-size:12.5px}
   }
+
+  /* ---------- Liens vers le site ---------- */
+  .dvf-topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .dvf-topnav a{color:#fff;text-decoration:none;font-size:13px}
+  .dvf-brand{font-family:'Fraunces',Georgia,serif;font-size:15px!important;letter-spacing:.01em}
+  .dvf-brand b{color:var(--or);font-weight:500}
+  .dvf-back{border:1px solid rgba(216,179,60,.6);border-radius:999px;padding:7px 14px;color:var(--or)!important;white-space:nowrap}
+  .dvf-back:hover{background:rgba(216,179,60,.12)}
+  .dvf-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:22px 30px;border-top:1px solid var(--ligne);background:#fff}
+  .dvf-links a{display:inline-block;text-decoration:none;font-size:14px;font-weight:600;border-radius:999px;padding:12px 20px;min-height:44px}
+  .dvf-links .l1{background:var(--noir);color:#fff}
+  .dvf-links .l2{border:1px solid var(--noir);color:var(--noir)}
+  @media (max-width:520px){.dvf-topnav a{font-size:12px}.dvf-brand{font-size:13px!important}.dvf-links a{width:100%;text-align:center}}
 </style>
 </head>
 <body>
 
 <div class="dvf-app" id="dvfApp">
   <header class="dvf-head">
+    <nav class="dvf-topnav">
+      <a class="dvf-brand" href="https://www.davidregneryimmobilier.com/" target="_top">David Regnery <b>Immobilier</b></a>
+      <a class="dvf-back" href="https://www.davidregneryimmobilier.com/" target="_top">Retour au site</a>
+    </nav>
     <div class="dvf-eyebrow">Estimation offerte</div>
     <h1>Estimez votre bien en 2 minutes</h1>
     <p>Une fourchette de prix fondée sur les ventes réelles enregistrées près de chez vous (données DVF). Le prix juste, lui, s'affine ensemble lors d'une courte visite.</p>
@@ -249,7 +266,7 @@
       <img class="dvf-avatar" src="https://cdn.prod.website-files.com/65fda99a9719b665bb3722a7/6a3fa17b0eba33c0246c0436_TETE.png" alt="David Regnery" onerror="this.style.display='none'">
       <div class="dvf-expert-txt">
         <p class="dvf-quote">« Un bien au juste prix se vend. Je pars des ventes réelles de votre rue, puis j'affine sur place — c'est là que se joue la différence. »</p>
-        <p class="dvf-expert-name">David Regnery — conseiller immobilier <span class="dvf-google">· ★ 5/5 · 75 avis Google</span></p>
+        <p class="dvf-expert-name">David Regnery — conseiller immobilier <span class="dvf-google">· ★ 5/5 · 81 avis Google</span></p>
       </div>
     </div>
   </header>
@@ -434,6 +451,11 @@
       </div>
       <div id="outState" style="display:none"></div>
     </div>
+  </div>
+
+  <div class="dvf-links">
+    <a class="l1" href="https://www.davidregneryimmobilier.com/nos-biens" target="_top">Découvrir mes biens à vendre</a>
+    <a class="l2" href="https://www.davidregneryimmobilier.com/contact" target="_top">Me contacter</a>
   </div>
 
   <div class="dvf-foot">
